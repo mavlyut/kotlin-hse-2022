@@ -34,12 +34,14 @@ private constructor(val value: T, internal val children: FList<BinomialTree<T>>)
      * Требуемая сложность - O(1)
      */
     override fun plus(other: BinomialTree<T>): BinomialTree<T> {
-        if (order != other.order)
+        if (order != other.order) {
             throw IllegalArgumentException("Orders must be equals")
-        return if (value < other.value)
+        }
+        return if (value < other.value) {
             BinomialTree(value, FList.Cons(other, children))
-        else
+        } else {
             BinomialTree(other.value, FList.Cons(this, other.children))
+        }
     }
 
     companion object {

@@ -1,12 +1,10 @@
 package binomial
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import kotlin.test.fail
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 internal class BinomialTreeTest {
-
     @Test
     fun getOrder() {
         assertEquals(0, BinomialTree.single(134).order)
@@ -63,11 +61,7 @@ internal class BinomialTreeTest {
         val bt2 = BinomialTree.single(234)
         val bt3 = bt1 + bt2
 
-        try {
-            bt1 + bt3
-            fail("failed to throw exception")
-        } catch (e: IllegalArgumentException) {
-        }
+        assertThrows<IllegalArgumentException> { bt1 + bt3 }
     }
 
     @Test
@@ -76,10 +70,6 @@ internal class BinomialTreeTest {
         val bt2 = BinomialTree.single(234)
         val bt3 = bt1 + bt2
 
-        try {
-            bt3 + bt2
-            fail("failed to throw exception")
-        } catch (e: IllegalArgumentException) {
-        }
+        assertThrows<IllegalArgumentException> { bt3 + bt2 }
     }
 }

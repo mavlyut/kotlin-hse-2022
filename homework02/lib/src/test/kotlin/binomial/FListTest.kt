@@ -1,9 +1,7 @@
 package binomial
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import org.junit.Test
+import org.junit.jupiter.api.Assertions.*
 
 internal class FListTest {
     @Test
@@ -22,7 +20,7 @@ internal class FListTest {
 
     @Test
     fun testToList() {
-        assertEquals(emptyList(), FList.nil.toList())
+        assertEquals(emptyList<Any?>(), FList.nil.toList())
         assertEquals(listOf("hello"), FList.Cons("hello", FList.nil).toList())
         assertEquals(
             listOf("hello", "world"),
@@ -44,7 +42,7 @@ internal class FListTest {
 
     @Test
     fun testMap() {
-        assertEquals(FList.nil(), FList.nil<String>().map { it.length })
+        assertEquals(FList.nil, FList.nil<String>().map { it.length })
         assertEquals(FList.Cons(5, FList.nil()), FList.Cons("hello", FList.nil()).map { it.length })
         assertEquals(
             FList.Cons(5, FList.Cons(6, FList.nil())),
@@ -54,12 +52,12 @@ internal class FListTest {
 
     @Test
     fun testFilter() {
-        assertEquals(FList.nil(), FList.nil<String>().filter { it.length > 0 && it[0] == 'h' })
+        assertEquals(FList.nil, FList.nil<String>().filter { it.length > 0 && it[0] == 'h' })
         assertEquals(
             FList.Cons("hello", FList.nil()),
             FList.Cons("hello", FList.nil()).filter { it.length > 0 && it[0] == 'h' }
         )
-        assertEquals(FList.nil(), FList.Cons("hello", FList.nil()).filter { it.length > 0 && it[0] != 'h' })
+        assertEquals(FList.nil, FList.Cons("hello", FList.nil()).filter { it.length > 0 && it[0] != 'h' })
         assertEquals(
             FList.Cons("hello", FList.nil()),
             FList.Cons("hello", FList.Cons("people", FList.nil())).filter { it.length > 0 && it[0] == 'h' }
@@ -82,8 +80,16 @@ internal class FListTest {
 
     @Test
     fun testReverse() {
-        assertEquals(flistOf(), flistOf<String>().reverse())
+        assertEquals(flistOf<Any?>(), flistOf<String>().reverse())
         assertEquals(flistOf("hello"), flistOf("hello").reverse())
         assertEquals(flistOf("people", "hello"), flistOf("hello", "people").reverse())
+    }
+
+    @Test
+    fun bigList() {
+        assertDoesNotThrow {
+            val a = Array(100_000) { it }
+            flistOf(*a)
+        }
     }
 }

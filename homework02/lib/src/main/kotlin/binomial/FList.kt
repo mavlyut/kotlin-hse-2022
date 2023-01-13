@@ -97,11 +97,9 @@ sealed class FList<T> : Iterable<T> {
         override fun hasNext() = !fl.isEmpty
 
         override fun next(): T {
-            if (!hasNext())
-                throw InputMismatchException()
-            val ans = (fl as Cons<T>).head
-            fl = (fl as Cons<T>).tail
-            return ans
+            val ans = fl.headOrNull()
+            fl = fl.tail()
+            return ans ?: throw NoSuchElementException()
         }
     }
 
@@ -114,8 +112,8 @@ sealed class FList<T> : Iterable<T> {
 // конструирование функционального списка в порядке следования элементов
 // требуемая сложность - O(n)
 
-internal fun <T> build(k: Int, vararg values: T): FList<T> =
-    if (k == values.size) FList.nil()
-    else FList.Cons(values[k], build(k + 1, *values))
+internal tailrec fun <T> build(ans: FList<T>, it: Iterator<T>): FList<T> =
+    if (!it.hasNext()) ans
+    else build(FList.Cons(it.next(), ans), it)
 
-fun <T> flistOf(vararg values: T): FList<T> = build(0, *values)
+fun <T> flistOf(vararg values: T): FList<T> = build(FList.nil(), values.iterator())

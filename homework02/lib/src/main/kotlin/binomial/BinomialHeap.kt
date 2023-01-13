@@ -39,8 +39,9 @@ private constructor(private val trees: FList<out BinomialTree<T>?>) : SelfMergea
 
     private fun recursiveMerge(tr1: FList<out BinomialTree<T>?>, tr2: FList<out BinomialTree<T>?>, ans: BinomialTree<T>?)
             : FList<BinomialTree<T>?> {
-        if (tr1.isEmpty && tr2.isEmpty && ans == null)
+        if (tr1.isEmpty && tr2.isEmpty && ans == null) {
             return FList.Nil()
+        }
         val a = tr1.headOrNull()
         val b = tr2.headOrNull()
         return when (isNull(a) * 4 + isNull(b) * 2 + isNull(ans)) {
@@ -78,14 +79,16 @@ private constructor(private val trees: FList<out BinomialTree<T>?>) : SelfMergea
      */
     fun drop(): BinomialHeap<T> = dropRecur(top(), trees)
 
-    private fun dropRecur(min: T, tr: FList<out BinomialTree<T>?>,
+    private tailrec fun dropRecur(min: T, tr: FList<out BinomialTree<T>?>,
                           f1: FList<BinomialTree<T>?> = FList.Nil(), f2: FList<BinomialTree<T>> = FList.Nil())
             : BinomialHeap<T> {
-        if (tr.isEmpty)
+        if (tr.isEmpty) {
             return BinomialHeap(f1.reverse()) + BinomialHeap(f2.reverse())
+        }
         val head = tr.headOrNull()
-        if (head?.value != min)
+        if (head?.value != min) {
             return dropRecur(min, tr.tail(), FList.Cons(head, f1), f2)
+        }
         return dropRecur(min, tr.tail(), FList.Cons(null, f1), head.children)
     }
 }
