@@ -1,7 +1,5 @@
 package binomial
 
-import java.util.InputMismatchException
-
 /*
  * FList - реализация функционального списка
  *
@@ -86,20 +84,39 @@ sealed class FList<T> : Iterable<T> {
 
         override fun tail() = tail
 
-        override fun <U> fold(base: U, f: (U, T) -> U) = tail.fold(f(base, head), f)
+        private tailrec fun <U> foldRecur(ans: U, f: (U, T) -> U, it: FListIterator<T>): U =
+            if (!it.hasNext()) ans else foldRecur(f(ans, it.next()), f, it)
 
-        override fun filter(f: (T) -> Boolean) = if (f(head)) Cons(head, tail.filter(f)) else tail.filter(f)
+        override fun <U> fold(base: U, f: (U, T) -> U) = foldRecur(base, f, FListIterator(this))
 
-        override fun <U> map(f: (T) -> U) = Cons(f(head), tail.map(f))
+        private tailrec fun filterRecur(f: (T) -> Boolean, ans: FList<T>, it: FListIterator<T>): FList<T> =
+            if (!it.hasNext()) ans
+            else {
+                val head = it.next()
+                filterRecur(f, if (f(head)) Cons(head, ans) else ans, it)
+            }
+
+        override fun filter(f: (T) -> Boolean) = filterRecur(f, Nil(), FListIterator(this))
+
+        private tailrec fun <U> mapRecur(f: (T) -> U, ans: FList<U>, it: FListIterator<T>): FList<U> =
+            if (!it.hasNext()) ans else mapRecur(f, Cons(f(it.next()), ans), it)
+
+        override fun <U> map(f: (T) -> U): FList<U> {
+            val it = FListIterator(reverse())
+            return mapRecur(f, Nil(), it)
+        }
     }
 
     private class FListIterator<T>(var fl: FList<T>) : Iterator<T> {
         override fun hasNext() = !fl.isEmpty
 
         override fun next(): T {
-            val ans = fl.headOrNull()
+            if (!hasNext()) {
+                throw NoSuchElementException()
+            }
+            val ans = (fl as Cons).headOrNull()
             fl = fl.tail()
-            return ans ?: throw NoSuchElementException()
+            return ans
         }
     }
 

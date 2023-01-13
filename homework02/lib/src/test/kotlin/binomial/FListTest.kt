@@ -86,10 +86,15 @@ internal class FListTest {
     }
 
     @Test
-    fun bigList() {
+    fun testBigList() {
+        // build, filter, map, fold
         assertDoesNotThrow {
             val a = Array(100_000) { it }
-            flistOf(*a)
+            val f = flistOf(*a).filter { it % 7 != 4 }.map { it + 90 }
+            val g = a.filter { it % 7 != 4 }.map { it + 90 }
+            val iter = f.iterator()
+            (0 until f.size).forEach { assertEquals(iter.next(), g[it]) }
+            assertEquals(f.fold(0, Int::plus), g.fold(0, Int::plus))
         }
     }
 }
