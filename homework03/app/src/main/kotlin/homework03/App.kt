@@ -10,7 +10,6 @@ import kotlinx.coroutines.runBlocking
 suspend fun main(vararg args: String) {
     if (args.isEmpty())
         println("Usage: ...names\nNames of subreddits were expected (e.g. Kotlin, Cpp or Python)")
-    val start = System.currentTimeMillis()
     runBlocking {
         args.forEach {
             launch {
@@ -18,5 +17,4 @@ suspend fun main(vararg args: String) {
             }
         }
     }
-    println((System.currentTimeMillis() - start) / 1000)
 }
