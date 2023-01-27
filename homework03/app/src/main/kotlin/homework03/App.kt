@@ -3,13 +3,20 @@
  */
 package homework03
 
-class App {
-    val greeting: String
-        get() {
-            return "Hello World!"
-        }
-}
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-fun main() {
-    println(App().greeting)
+// Task 4
+suspend fun main(vararg args: String) {
+    if (args.isEmpty())
+        println("Usage: ...names\nNames of subreddits were expected (e.g. Kotlin, Cpp or Python)")
+    val start = System.currentTimeMillis()
+    runBlocking {
+        args.forEach {
+            launch {
+                RedditClient().parseSubreddit(it)
+            }
+        }
+    }
+    println((System.currentTimeMillis() - start) / 1000)
 }

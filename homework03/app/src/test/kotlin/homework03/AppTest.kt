@@ -3,12 +3,21 @@
  */
 package homework03
 
-import kotlin.test.Test
-import kotlin.test.assertNotNull
+import com.soywiz.korio.util.expectException
+import homework03.json.comment.CommentsSnapshot
+import homework03.serialization.serializeAndWrite
 
-class AppTest {
-    @Test fun appHasAGreeting() {
-        val classUnderTest = App()
-        assertNotNull(classUnderTest.greeting, "app should have a greeting")
+suspend fun main() {
+    val client = RedditClient()
+    println(client.getTopic("Kotlin").discussions)
+    println(client.getTopic("cpp"))
+    val comments = client.getComments(
+        "https://www.reddit.com/r/Kotlin/comments/10gxzbn/kotlin_cross_platform_development_with_macmin/"
+    ).comments
+    serializeAndWrite(comments, CommentsSnapshot.SingleComment::class, file = "--comments.csv",
+        path = "/home/mavlyut/IdeaProjects/kotlin-hse-2022/homework03/app/src/test/kotlin/homework03")
+    client.parseSubreddit("Kotlin")
+    expectException<RedditClientExceptions.BadExitStatusException> {
+        client.getComments("https://www.reddit.com/r/Kotlin/comments/aboba/")
     }
 }
