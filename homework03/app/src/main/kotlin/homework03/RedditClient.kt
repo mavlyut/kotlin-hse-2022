@@ -17,6 +17,7 @@ import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.nio.channels.UnresolvedAddressException
@@ -28,16 +29,16 @@ sealed class RedditClientExceptions(message: String) : RuntimeException(message)
 }
 
 class RedditClient {
-    companion object {
-        private val objectMapper = ObjectMapper()
-        private val client = HttpClient(CIO) {
-            HttpResponseValidator {
-                validateResponse { response ->
-                    if (response.status.value !in 200..299)
-                        throw BadExitStatusException(response.status.value)
-                }
+    private val objectMapper = ObjectMapper()
+    private val client = HttpClient(CIO) {
+        HttpResponseValidator {
+            validateResponse { response ->
+                if (response.status.value !in 200..299)
+                    throw BadExitStatusException(response.status.value)
             }
         }
+    }
+    companion object {
         private const val domainName = "https://www.reddit.com"
     }
 
@@ -108,8 +109,14 @@ class RedditClient {
             serializeAndWrite(data = discussions, klass = Discussion::class, file = "$name--subjects.csv")
         }
         launch {
-            val comments = discussions.map { getComments("$domainName${it.permalink}").comments }.flatten()
-            serializeAndWrite(data = comments, klass = SingleComment::class, file = "$name--comments.csv")
+            val allComments = mutableListOf<List<SingleComment>>()
+            for (discussion in discussions)
+                allComments.add(
+                    async {
+                        getComments("$domainName${discussion.permalink}").comments
+                    }.await()
+                )
+            serializeAndWrite(data = allComments.flatten(), klass = SingleComment::class, file = "$name--comments.csv")
         }
     }
 }
