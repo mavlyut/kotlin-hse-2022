@@ -1,4 +1,5 @@
 import java.io.FileWriter
+import Align.*
 
 fun html(init: Html.() -> Unit) = Html().apply(init)
 

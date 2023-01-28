@@ -26,7 +26,7 @@ fun main() {
                 + "Site"
             }
             div {
-                p { + "text before link" }
+                p(Align.justify) { h1 { + "text before link" } }
                 a("https://reddit.com/r/Kotlin") {
                     + "Go to subreddit Kotlin"
                 }
